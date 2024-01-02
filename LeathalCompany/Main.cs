@@ -10,7 +10,7 @@ using Debug = UnityEngine.Debug;
 namespace LeathalCompany
 {
     [BepInPlugin("com.KMAN.LeathalCompany", "Leathal", "1.1.1")]
-    public class Class1 : BaseUnityPlugin
+    public class Main : BaseUnityPlugin
     {
         public void Awake()
         {
@@ -96,16 +96,17 @@ namespace LeathalCompany
             {
                 deltaTime += (Time.unscaledDeltaTime - deltaTime) * 0.1f;
                 newRect = GUI.Window(0, newRect, new GUI.WindowFunction(newWindow), $"Steal UI - By KMAN [FPS: {1 / deltaTime}]");
+                GUI.backgroundColor = Color.white;
             }
         }
         bool player = false;
         bool visual = false;
         bool room = false;
         bool misc = false;
-        public static Font font;
+        public static Vector2[] scroll = new Vector2[100];
+        public static Texture2D scrollView = new Texture2D(1, 1);
         public void newWindow(int id)
         {
-            
             if (GUILayout.Button("<b>Player</b>"))
             {
                 player = !player;
@@ -117,7 +118,7 @@ namespace LeathalCompany
                 GUI.skin.button.normal.textColor = textcolor312;
                 GUI.skin.button.active.textColor = textcolor312;
                 GUI.skin.button.hover.textColor = textcolor312;
-                if (GUILayout.Button(af212, GUILayout.Width(newRect.width)))
+                if (GUILayout.Button(af212))
                 {
                     Stamina = !Stamina;
                 }
@@ -127,7 +128,7 @@ namespace LeathalCompany
                 GUI.skin.button.normal.textColor = textcolor3;
                 GUI.skin.button.active.textColor = textcolor3;
                 GUI.skin.button.hover.textColor = textcolor3;
-                if (GUILayout.Button(af2, GUILayout.Width(newRect.width)))
+                if (GUILayout.Button(af2))
                 {
                     speedB = !speedB;
                 }
@@ -135,24 +136,24 @@ namespace LeathalCompany
                 GUI.skin.button.active.textColor = Color.white;
                 GUI.skin.button.hover.textColor = Color.white;
 
-                if (GUILayout.Button("Heal Self", GUILayout.Width(newRect.width)))
+                if (GUILayout.Button("Heal Self"))
                 {
                     GameNetworkManager.Instance.localPlayerController.DamagePlayerFromOtherClientServerRpc(-100, new Vector3(0, 0, 0), 0);
                 }
 
-                if (GUILayout.Button("Kill Self", GUILayout.Width(newRect.width)))
+                if (GUILayout.Button("Kill Self"))
                 {
                     GameNetworkManager.Instance.localPlayerController.DamagePlayerFromOtherClientServerRpc(100, new Vector3(0, 0, 0), 0);
                 }
 
                 GUILayout.Label("FOV: " + inputfov);
-                inputfov = GUILayout.VerticalSlider(inputfov, 0, 220, GUILayout.Width(100));
-                if (GUILayout.Button("Set FOV", GUILayout.Width(newRect.width)))
+                inputfov = GUILayout.HorizontalSlider(inputfov, 0, 220);
+                if (GUILayout.Button("Set FOV"))
                 {
                     fov = inputfov;
                 }
             }
-
+            GUILayout.Space(10);
             if (GUILayout.Button("<b>Visual</b>"))
             {
                 visual = !visual;
@@ -164,7 +165,7 @@ namespace LeathalCompany
                 GUI.skin.button.normal.textColor = textcolor;
                 GUI.skin.button.active.textColor = textcolor;
                 GUI.skin.button.hover.textColor = textcolor;
-                if (GUILayout.Button(monsteresp, GUILayout.Width(newRect.width)))
+                if (GUILayout.Button(monsteresp))
                 {
                     toggle = !toggle;
                 }
@@ -174,7 +175,7 @@ namespace LeathalCompany
                 GUI.skin.button.normal.textColor = textcolor2;
                 GUI.skin.button.active.textColor = textcolor2;
                 GUI.skin.button.hover.textColor = textcolor2;
-                if (GUILayout.Button(af, GUILayout.Width(newRect.width)))
+                if (GUILayout.Button(af))
                 {
                     esp = !esp;
                 }
@@ -184,12 +185,12 @@ namespace LeathalCompany
                 GUI.skin.button.normal.textColor = textcol13or2;
                 GUI.skin.button.active.textColor = textcol13or2;
                 GUI.skin.button.hover.textColor = textcol13or2;
-                if (GUILayout.Button(af213, GUILayout.Width(newRect.width)))
+                if (GUILayout.Button(af213))
                 {
                     objesp = !objesp;
                 }
             }
-
+            GUILayout.Space(10);
             if (GUILayout.Button("<b>Room</b>"))
             {
                 room = !room;
@@ -201,7 +202,7 @@ namespace LeathalCompany
                 GUI.skin.button.normal.textColor = Color.white;
                 GUI.skin.button.active.textColor = Color.white;
                 GUI.skin.button.hover.textColor = Color.white;
-                if (GUILayout.Button("Kill Others", GUILayout.Width(newRect.width)))
+                if (GUILayout.Button("Kill Others"))
                 {
                     EnemyAI[] ps = FindObjectsOfType(typeof(EnemyAI)) as EnemyAI[];
                     for (int i = 0; i < ps.Length; i++)
@@ -212,7 +213,7 @@ namespace LeathalCompany
                     }
                 }
 
-                if (GUILayout.Button("Heal Others", GUILayout.Width(newRect.width)))
+                if (GUILayout.Button("Heal Others"))
                 {
                     PlayerControllerB[] ps = FindObjectsOfType(typeof(PlayerControllerB)) as PlayerControllerB[];
                     for (int i = 0; i < ps.Length; i++)
@@ -223,7 +224,7 @@ namespace LeathalCompany
                     }
                 }
 
-                if (GUILayout.Button("Kill All Enemies", GUILayout.Width(newRect.width)))
+                if (GUILayout.Button("Kill All Enemies"))
                 {
                     foreach (EnemyAI enemy in FindObjectsOfType(typeof(EnemyAI)) )
                     {
@@ -231,25 +232,24 @@ namespace LeathalCompany
                     }
                 }
             }
-
+            GUILayout.Space(10);
             if (GUILayout.Button("<b>Misc</b>"))
             {
                 misc = !misc;
             }
             if (misc)
             {
-                if (GUILayout.Button("Break Legs Sound", GUILayout.Width(newRect.width)))
+                if (GUILayout.Button("Break Legs Sound"))
                 {
                     GameNetworkManager.Instance.localPlayerController.BreakLegsSFXServerRpc();
                 }
             }
-
+            GUILayout.Space(10);
 
             if (GUILayout.Button("JOIN DISCORD"))
             {
                 Process.Start("https://discord.gg/clients");
             }
-
             GUI.DragWindow(new Rect(0, 0, 10000, 10000));
         }
 
